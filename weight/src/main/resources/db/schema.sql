@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS weight (
+    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    weight_date DATE NOT NULL,
+    weight FLOAT NOT NULL
+) engine=InnoDB;

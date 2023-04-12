@@ -1,0 +1,5 @@
+CREATE DATABASE IF NOT EXISTS ms_ht_weight;
+
+ALTER DATABASE ms_ht_weight
+    DEFAULT CHARACTER SET utf8
+    DEFAULT COLLATE utf8_general_ci;
