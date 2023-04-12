@@ -12,7 +12,7 @@ public class SpringCloudConfig {
     public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route( "weight-tracker", r -> r.path("/weight/**")
-                        .uri("http://localhost:8081"))
+                        .uri("http://localhost:8082"))
                 .build();
     }
 }
