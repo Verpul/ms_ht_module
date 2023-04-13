@@ -9,12 +9,14 @@
         <outputRelativeToContentRoot value="true" />
         <module name="apigateway" />
         <module name="weight" />
+        <module name="authserver" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="apigateway" options="-parameters" />
+      <module name="authserver" options="-parameters" />
       <module name="weight" options="-parameters" />
     </option>
   </component>

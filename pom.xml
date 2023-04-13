@@ -12,6 +12,7 @@
     <modules>
         <module>weight</module>
         <module>apigateway</module>
+        <module>authserver</module>
     </modules>
 
 </project>
