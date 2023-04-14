@@ -12,7 +12,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/weight/**").permitAll()
+                        .requestMatchers("/weight/**").authenticated()
                 )
                 .oauth2ResourceServer()
                 .jwt();

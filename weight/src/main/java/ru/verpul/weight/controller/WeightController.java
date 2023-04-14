@@ -9,7 +9,6 @@ import ru.verpul.weight.repository.WeightRepository;
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/weight")
 public class WeightController {

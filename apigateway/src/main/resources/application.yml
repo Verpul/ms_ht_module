@@ -6,7 +6,7 @@ spring:
     gateway:
       routes:
         - id: weight
-          uri: http://127.0.0.1:8100
+          uri: http://localhost:8100
           predicates:
             - Path=/weight
           filters:
