@@ -1,29 +1,17 @@
 server:
-  port: 8080
+  port: 8090
 
 spring:
   cloud:
     gateway:
+      globalcors:
+        corsconfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders: "*"
+            allowedMethods: "*"
       routes:
         - id: weight
           uri: http://localhost:8100
           predicates:
             - Path=/weight
-          filters:
-            - TokenRelay=
-            - RemoveRequestHeader=Cookie
-
-  security:
-    oauth2:
-      client:
-        registration:
-          gateway:
-            provider: spring
-            client-id: gateway
-            client-secret: secret
-            authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-            scope: openid
-        provider:
-          spring:
-            issuer-uri: http://localhost:9000

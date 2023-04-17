@@ -9,9 +9,11 @@
         <outputRelativeToContentRoot value="true" />
         <module name="apigateway" />
         <module name="weight" />
-        <module name="authserver" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="authserver" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

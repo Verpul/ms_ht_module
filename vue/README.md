@@ -1,4 +1,4 @@
-# test2-vuetify
+# vue3
 
 ## Project setup
 ```
