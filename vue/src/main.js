@@ -3,12 +3,15 @@ import App from './App.vue'
 import router from './router'
 import vuetify from './plugins/vuetify'
 import Keycloak from "keycloak-js";
-import axios from "axios";
+import setHeader from "@/service/HeaderService";
 
 Vue.config.productionTip = false
 
 let initOptions = {
-  url: 'http://127.0.0.1:8081/', realm: 'NewRealm', clientId: 'spring-gateway-client', onLoad: 'login-required'
+  url: process.env.VUE_APP_KEYCLOAK_URL,
+  realm: process.env.VUE_APP_KEYCLOAK_REALM,
+  clientId: process.env.VUE_APP_CLIENT_ID,
+  onLoad: process.env.VUE_APP_ON_LOAD
 }
 
 let keycloak = new Keycloak(initOptions);
@@ -17,26 +20,22 @@ keycloak.init({onLoad: initOptions.onLoad}).then((auth) => {
   if (!auth) {
     window.location.reload();
   } else {
-    console.log("Authenticated");
     setHeader(keycloak.token);
 
     new Vue({
       router,
       vuetify,
       render: h => h(App)
-    }).$mount('#app')
+    }).$mount('#app');
+
+    //For logout
+    Vue.prototype.$keycloak = keycloak
   }
 
   //Token refresh
   setInterval(() => {
     keycloak.updateToken(1200).then((refreshed) => {
-      if (refreshed) {
-        console.log('Token refreshed' + refreshed);
-        setHeader(keycloak.token);
-      } else {
-        console.log('Token not refreshed, valid for '
-            + Math.round(keycloak.tokenParsed.exp + keycloak.timeSkew - new Date().getTime() / 1000) + ' seconds');
-      }
+      if (refreshed) setHeader(keycloak.token);
     }).catch(() => {
       console.log('Failed to refresh token');
     });
@@ -46,8 +45,4 @@ keycloak.init({onLoad: initOptions.onLoad}).then((auth) => {
   console.log("Authenticated Failed");
 });
 
-function setHeader(token) {
-  console.log(token)
-  axios.defaults.headers.common['Authorization'] =`Bearer ` + token;
-}
 

@@ -1,14 +1,23 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import Index from "@/components/Index";
+import WeightTracker from "@/components/WeightTracker";
 
 Vue.use(VueRouter)
 
 const routes = [
-  // {
-  //   path: '/',
-  //   name: 'home',
-  //   component: HomeView
-  // },
+  {
+    path: '/',
+    name: 'Index',
+    component: Index,
+    children: [
+      {
+        name: "Weight Tracker",
+        path: "/weight",
+        component: WeightTracker
+      }
+    ]
+  },
   // {
   //   path: '/about',
   //   name: 'about',
