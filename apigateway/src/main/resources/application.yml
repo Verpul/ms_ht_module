@@ -7,11 +7,11 @@ spring:
       globalcors:
         corsconfigurations:
           '[/**]':
-            allowedOrigins: "http://localhost:8080"
+            allowedOrigins: "http://localhost:8081"
             allowedHeaders: "Authorization, Content-Type"
             allowedMethods: "GET, POST, PUT, DELETE, OPTIONS"
       routes:
         - id: weight
-          uri: http://localhost:8100
+          uri: http://weight:8100
           predicates:
             - Path=/weight/**
