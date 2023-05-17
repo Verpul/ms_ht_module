@@ -13,5 +13,7 @@ spring:
       routes:
         - id: weight
           uri: http://weight:8100
+         # Without Docker
+         # uri: http://localhost:8100
           predicates:
             - Path=/weight/**
