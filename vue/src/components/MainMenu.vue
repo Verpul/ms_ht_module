@@ -23,6 +23,14 @@
             <v-list-item-title>Контроль веса</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <v-list-item to="/purchases">
+          <v-list-item-action>
+            <v-icon>mdi-cart-outline</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Покупки и гарантии</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
 
       <template v-slot:append>

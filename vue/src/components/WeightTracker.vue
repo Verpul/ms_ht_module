@@ -1,7 +1,7 @@
 <template>
   <v-card width="600px" class="mx-auto"
           outlined>
-    <v-form ref="form" lazy-validation>
+    <v-form ref="form">
       <v-simple-table class="ma-5">
         <thead>
         <tr>

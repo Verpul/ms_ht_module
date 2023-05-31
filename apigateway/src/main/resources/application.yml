@@ -17,3 +17,9 @@ spring:
          # uri: http://localhost:8100
           predicates:
             - Path=/weight/**
+        - id: purchases
+          uri: http://purcahses:8101
+          # Without Docker
+          # uri: http://localhost:8100
+          predicates:
+            - Path=/purchases/**

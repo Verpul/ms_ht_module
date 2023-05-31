@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,6 +29,11 @@ public class Purchase {
     @Nullable
     @URL(message = "Неверная ссылка")
     private String link;
+
+    @Column(name = "purchase_place")
+    @Nullable
+    @Size(max = 100, message = "Поле не может привышать 100 символов")
+    private String purchasePlace;
 
     @Column(name = "amount")
     @NotNull(message = "Поле Количество обязательно к заполению")
