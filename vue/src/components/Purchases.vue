@@ -38,14 +38,14 @@
                   v-for="(record) in recordsActive"
                   :key="record.id"
               >
-                <td v-if="record.link == null">{{ record.title }}</td>
+                <td v-if="record.link == null || record.link === ''">{{ record.title }}</td>
                 <td v-else><a
                     :href="record.link">{{ record.title }}</a></td>
                 <td>{{ record.amount }}</td>
                 <td>{{ record.purchasePlace }}</td>
                 <td class="text-right">
                   <div class="d-inline-block" style="white-space: nowrap">
-                    <v-btn density="compact" @click="setEditMode(record)" icon>
+                    <v-btn density="compact" @click="editRecord(record)" icon>
                       <v-icon color="warning">mdi-square-edit-outline</v-icon>
                     </v-btn>
                     <v-btn density="compact" @click="deleteRecord(record.id)" class="ms-3"
@@ -88,7 +88,7 @@
                 <td>{{ record.purchasePlace }}</td>
                 <td class="text-right">
                   <div class="d-inline-block" style="white-space: nowrap">
-                    <v-btn density="compact" @click="setEditMode(record)" icon>
+                    <v-btn density="compact" @click="editRecord(record)" icon>
                       <v-icon color="warning">mdi-square-edit-outline</v-icon>
                     </v-btn>
                     <v-btn density="compact" @click="deleteRecord(record.id)" class="ms-3"
@@ -127,7 +127,7 @@
                 <td>{{ formatDate(record.purchaseDate) }}</td>
                 <td class="text-right">
                   <div class="d-inline-block" style="white-space: nowrap">
-                    <v-btn density="compact" @click="setEditMode(record)" icon>
+                    <v-btn density="compact" @click="editRecord(record)" icon>
                       <v-icon color="warning">mdi-square-edit-outline</v-icon>
                     </v-btn>
                     <v-btn density="compact" @click="deleteRecord(record.id)" class="ms-3"
@@ -152,115 +152,125 @@
           persistent
           max-width="600px"
       >
-        <v-card>
-          <v-card-title>
-            <span class="text-h5">{{ tabs[tab] }}</span>
-          </v-card-title>
-          <!--    Fields for every tab start     -->
-          <v-card-text>
-            <v-text-field
-                label="Наименование*"
-                required
-            ></v-text-field>
-            <v-row>
-              <v-col cols="6">
-                <v-text-field
-                    label="Количество*"
-                    type="number"
-                    required
-                ></v-text-field>
-              </v-col>
-              <v-col cols="6">
-                <v-select
-                    v-model="sourceOfPurchaseSelected"
-                    :items="sourceOfPurchase"
-                    label="Источник покупки"
-                    multiple
-                ></v-select>
-              </v-col>
-            </v-row>
-            <v-expand-transition>
-              <div v-if="checkSourceOfPurchaseSelected('Ссылка')">
-                <v-text-field
-                    label="Ссылка"
-                ></v-text-field>
-              </div>
-            </v-expand-transition>
-            <v-expand-transition>
-              <div v-if="checkSourceOfPurchaseSelected('Место покупки')">
-                <v-text-field
-                    label="Место покупки"
-                ></v-text-field>
-              </div>
-            </v-expand-transition>
-            <!--    Fields for every tab end     -->
-
-            <!--    Fields for Guarantee and Links&Places tabs start     -->
-            <!--    Purchase date       -->
-            <div v-if="tab !== 0">
-              <v-menu
-                  v-model="calendarMenu"
-                  :close-on-content-click="false"
-                  :nudge-right="40"
-                  transition="scale-transition"
-                  offset-y
-                  min-width="auto"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-text-field
-                      v-model="computedDateFormatted"
-                      label="Дата покупки*"
-                      readonly
-                      v-bind="attrs"
-                      v-on="on"
-                  ></v-text-field>
-                </template>
-                <v-date-picker
-                    v-model="purchaseDate"
-                    @input="calendarMenu = false"
-                    locale="ru-ru"
-                ></v-date-picker>
-              </v-menu>
-            </div>
-            <!--    Fields for Guarantee tab end     -->
-
-            <!--    Fields for Guarantee tab start     -->
-            <!--    Guarantee time        -->
-            <div v-if="tab === 1">
+        <v-form ref="form">
+          <v-card>
+            <v-card-title>
+              <span class="text-h5">{{ tabs[tab] }}</span>
+            </v-card-title>
+            <!--    Fields for every tab start     -->
+            <v-card-text>
+              <v-text-field
+                  label="Наименование*"
+                  v-model="purchaseData.title"
+                  :rules="purchaseDataRules.titleRules"
+                  required
+              ></v-text-field>
               <v-row>
                 <v-col cols="6">
-                  <v-select
-                      :items="guaranteeTimeInterval"
-                      label="Гарантия (интервал)*"
-                  ></v-select>
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field type="number"
-                                label="Гарантия (количество)*"
+                  <v-text-field
+                      label="Количество*"
+                      type="number"
+                      v-model="purchaseData.amount"
+                      :rules="purchaseDataRules.amountRules"
+                      required
                   ></v-text-field>
                 </v-col>
+                <v-col cols="6">
+                  <v-select
+                      v-model="sourceOfPurchaseSelected"
+                      :items="sourceOfPurchase"
+                      label="Источник покупки"
+                      multiple
+                  ></v-select>
+                </v-col>
               </v-row>
-            </div>
-            <!--    Fields for Guarantee tab end     -->
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-                color="blue darken-1"
-                text
-                @click="dialog = false"
-            >
-              Закрыть
-            </v-btn>
-            <v-btn
-                color="blue darken-1"
-                text
-                @click="dialog = false"
-            >
-              Сохранить
-            </v-btn>
-          </v-card-actions>
-        </v-card>
+              <v-expand-transition>
+                <div v-if="checkSourceOfPurchaseSelected('Ссылка')">
+                  <v-text-field
+                      label="Ссылка"
+                      v-model="purchaseData.link"
+                      :rules="purchaseDataRules.linkRules"
+                  ></v-text-field>
+                </div>
+              </v-expand-transition>
+              <v-expand-transition>
+                <div v-if="checkSourceOfPurchaseSelected('Место покупки')">
+                  <v-text-field
+                      label="Место покупки"
+                      v-model="purchaseData.purchasePlace"
+                      :rules="purchaseDataRules.purchasePlaceRules"
+                  ></v-text-field>
+                </div>
+              </v-expand-transition>
+              <!--    Fields for every tab end     -->
+
+              <!--    Fields for Guarantee and Links&Places tabs start     -->
+              <!--    Purchase date       -->
+              <div v-if="tab !== 0">
+                <v-menu
+                    v-model="calendarMenu"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                        v-model="computedDateFormatted"
+                        label="Дата покупки*"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker
+                      v-model="purchaseDate"
+                      @input="calendarMenu = false"
+                      locale="ru-ru"
+                  ></v-date-picker>
+                </v-menu>
+              </div>
+              <!--    Fields for Guarantee tab end     -->
+
+              <!--    Fields for Guarantee tab start     -->
+              <!--    Guarantee time        -->
+              <div v-if="tab === 1">
+                <v-row>
+                  <v-col cols="6">
+                    <v-select
+                        :items="guaranteeTimeInterval"
+                        label="Гарантия (интервал)*"
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field type="number"
+                                  label="Гарантия (количество)*"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </div>
+              <!--    Fields for Guarantee tab end     -->
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="clearFields()"
+              >
+                Закрыть
+              </v-btn>
+              <v-btn
+                  color="blue darken-1"
+                  text
+                  @click="saveButtonModalWindows()"
+              >
+                Сохранить
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-form>
       </v-dialog>
     </v-row>
     <!--  Modal end  -->
@@ -290,7 +300,20 @@ export default {
         'День', 'Месяц', 'Год'
       ],
       purchaseDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-      calendarMenu: false
+      calendarMenu: false,
+      purchaseData: {
+        id: null,
+        title: null,
+        amount: 1,
+        link: null,
+        purchasePlace: null,
+      },
+      purchaseDataRules: {
+        titleRules: [],
+        amountRules: [],
+        purchasePlaceRules: [],
+        linkRules: []
+      }
     }
   },
   methods: {
@@ -311,12 +334,105 @@ export default {
     checkSourceOfPurchaseSelected(source) {
       return this.sourceOfPurchaseSelected.includes(source);
     },
+    saveButtonModalWindows() {
+      //Validate for every tab
+      this.purchaseDataRules.titleRules = [
+        v => !!v || "Введите наименование",
+        v => (v && v.length <= 250) || "Наименование не может превышать 250 символов"
+      ];
+
+      this.purchaseDataRules.amountRules = [
+        v => (!!v && (v >= 1 || v <= 999)) || "Количество должно быть от 1 до 999"
+      ]
+
+      this.purchaseDataRules.linkRules = [
+        v => (v === null || v === "" || (v && this.urlRegex().test(v))) || "Введите корректную ссылку"
+      ]
+
+      this.purchaseDataRules.purchasePlaceRules = [
+        v => (v === null || v === "" || (v && v.length <= 100 )) || "Место покупки не может превышать 100 символов"
+      ]
+
+      if (this.tab === 1) {
+        console.log("Nothing for now");
+      } else if (this.tab === 2) {
+        console.log("Nothing for now");
+      }
+
+      this.$nextTick(() => {
+        const valid = this.$refs.form.validate();
+
+        if (valid) {
+          if (this.purchaseData.id == null) {
+            PurchasesService.createRecord({
+              title: this.purchaseData.title,
+              amount: this.purchaseData.amount,
+              link: this.purchaseData.link,
+              purchasePlace: this.purchaseData.purchasePlace,
+            }).then(() => {
+              this.clearFields();
+              this.loadRecords();
+            });
+          } else {
+            PurchasesService.updateRecord(this.purchaseData.id, {
+              id: this.purchaseData.id,
+              title: this.purchaseData.title,
+              amount: this.purchaseData.amount,
+              link: this.purchaseData.link,
+              purchasePlace: this.purchaseData.purchasePlace,
+            }).then(() => {
+              this.clearFields();
+              this.loadRecords();
+            });
+          }
+        }
+      })
+    },
+    editRecord(record) {
+      this.purchaseData.id = record.id;
+      this.purchaseData.title = record.title;
+      this.purchaseData.amount = record.amount;
+
+      this.purchaseData.link = record.link;
+      if (record.link != null && record.link !== "") this.sourceOfPurchaseSelected.push("Ссылка");
+
+      this.purchaseData.purchasePlace = record.purchasePlace;
+      if (record.purchasePlace != null && record.purchasePlace !== "") this.sourceOfPurchaseSelected.push("Место покупки");
+
+      this.dialog = true;
+    },
+    deleteRecord(id) {
+      PurchasesService.deleteRecord(id).then(() => {
+        this.loadRecords();
+      })
+    },
+    clearFields() {
+      this.dialog = false;
+      this.id = null;
+      this.$refs.form.reset();
+
+      this.$nextTick(() => {
+        this.purchaseData.amount = 1;
+      })
+    },
+    urlRegex() {
+      const pattern = new RegExp(
+          '^(https?:\\/\\/)?' +
+          '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+          '((\\d{1,3}\\.){3}\\d{1,3}))' +
+          '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+          '(\\?[;&a-z\\d%_.~+=-]*)?' +
+          '(\\#[-a-z\\d_]*)?$',
+          'i'
+      );
+      return pattern;
+    },
   },
   created() {
     this.loadRecords();
   },
   computed: {
-    computedDateFormatted () {
+    computedDateFormatted() {
       return this.formatDate(this.purchaseDate)
     },
   },
