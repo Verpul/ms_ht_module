@@ -53,4 +53,12 @@ public class Purchase {
 
     @Column(name = "active")
     private Boolean active = true;
+
+    @Column(name = "guarantee_interval")
+    @Nullable
+    private String guaranteeInterval;
+
+    @Column(name = "guarantee_duration")
+    @Nullable
+    private Integer guaranteeDuration;
 }

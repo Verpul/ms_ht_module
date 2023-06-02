@@ -225,8 +225,9 @@
                     ></v-text-field>
                   </template>
                   <v-date-picker
-                      v-model="purchaseDate"
+                      v-model="purchaseData.purchaseDate"
                       @input="calendarMenu = false"
+                      :rules="purchaseDataRules.purchaseDateRules"
                       locale="ru-ru"
                   ></v-date-picker>
                 </v-menu>
@@ -240,12 +241,17 @@
                   <v-col cols="6">
                     <v-select
                         :items="guaranteeTimeInterval"
+                        v-model="purchaseData.guaranteeInterval"
+                        :rules="purchaseDataRules.guaranteeTimeIntervalRules"
                         label="Гарантия (интервал)*"
                     ></v-select>
                   </v-col>
                   <v-col cols="6">
-                    <v-text-field type="number"
-                                  label="Гарантия (количество)*"
+                    <v-text-field
+                        v-model="purchaseData.guaranteeDuration"
+                        :rules="purchaseDataRules.guaranteeDurationRules"
+                        type="number"
+                                  label="Гарантия (длительность)*"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -295,11 +301,10 @@ export default {
       sourceOfPurchase: [
         'Ссылка', 'Место покупки'
       ],
-      sourceOfPurchaseSelected: [],
       guaranteeTimeInterval: [
         'День', 'Месяц', 'Год'
       ],
-      purchaseDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      sourceOfPurchaseSelected: [],
       calendarMenu: false,
       purchaseData: {
         id: null,
@@ -307,12 +312,18 @@ export default {
         amount: 1,
         link: null,
         purchasePlace: null,
+        guaranteeInterval: null,
+        guaranteeDuration: null,
+        purchaseDate: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       },
       purchaseDataRules: {
         titleRules: [],
         amountRules: [],
         purchasePlaceRules: [],
-        linkRules: []
+        linkRules: [],
+        purchaseDateRules: [],
+        guaranteeTimeIntervalRules: [],
+        guaranteeDurationRules: []
       }
     }
   },
@@ -353,34 +364,56 @@ export default {
         v => (v === null || v === "" || (v && v.length <= 100 )) || "Место покупки не может превышать 100 символов"
       ]
 
+      //Guarantees and places
+      if (this.tab === 1 || this.tab === 2) {
+        this.purchaseDataRules.purchaseDateRules = [
+          v => !!v || "Выберите дату покупки",
+        ];
+      }
+
+      //Guarantee tab
       if (this.tab === 1) {
-        console.log("Nothing for now");
-      } else if (this.tab === 2) {
-        console.log("Nothing for now");
+        this.purchaseDataRules.guaranteeTimeIntervalRules = [
+          v => !!v || "Выберите временной интервал гарантии",
+        ];
+
+        this.purchaseDataRules.guaranteeDurationRules = [
+          v => !!v || "Выберите длительность гарантии",
+        ];
       }
 
       this.$nextTick(() => {
         const valid = this.$refs.form.validate();
 
         if (valid) {
+          const record = {
+            id: this.purchaseData.id,
+            title: this.purchaseData.title,
+            amount: this.purchaseData.amount,
+            link: this.purchaseData.link,
+            purchasePlace: this.purchaseData.purchasePlace,
+          }
+
+          //Guarantee & place
+          if (this.tab === 1 || this.tab === 2) {
+            record.purchaseDate = this.purchaseData.purchaseDate;
+          }
+
+          //Guarantee tab
+          if (this.tab === 1) {
+            record.active = false;
+            record.guaranteeInterval = this.purchaseData.guaranteeInterval;
+            record.guaranteeDuration = this.purchaseData.guaranteeDuration;
+            record.guaranteeExpireDate = this.getGuaranteeExpireDate(this.purchaseData.guaranteeInterval, this.purchaseData.guaranteeDuration);
+          }
+
           if (this.purchaseData.id == null) {
-            PurchasesService.createRecord({
-              title: this.purchaseData.title,
-              amount: this.purchaseData.amount,
-              link: this.purchaseData.link,
-              purchasePlace: this.purchaseData.purchasePlace,
-            }).then(() => {
+            PurchasesService.createRecord(record).then(() => {
               this.clearFields();
               this.loadRecords();
             });
           } else {
-            PurchasesService.updateRecord(this.purchaseData.id, {
-              id: this.purchaseData.id,
-              title: this.purchaseData.title,
-              amount: this.purchaseData.amount,
-              link: this.purchaseData.link,
-              purchasePlace: this.purchaseData.purchasePlace,
-            }).then(() => {
+            PurchasesService.updateRecord(this.purchaseData.id, record).then(() => {
               this.clearFields();
               this.loadRecords();
             });
@@ -399,6 +432,17 @@ export default {
       this.purchaseData.purchasePlace = record.purchasePlace;
       if (record.purchasePlace != null && record.purchasePlace !== "") this.sourceOfPurchaseSelected.push("Место покупки");
 
+      //Guarantee & places
+      if (this.tab === 1 || this.tab === 2) {
+        this.purchaseData.purchaseDate = record.purchaseDate;
+      }
+
+      //Guarantee tab
+      if (this.tab === 1) {
+        this.purchaseData.guaranteeInterval = record.guaranteeInterval;
+        this.purchaseData.guaranteeDuration = record.guaranteeDuration;
+      }
+
       this.dialog = true;
     },
     deleteRecord(id) {
@@ -407,13 +451,16 @@ export default {
       })
     },
     clearFields() {
-      this.dialog = false;
       this.id = null;
-      this.$refs.form.reset();
-
-      this.$nextTick(() => {
-        this.purchaseData.amount = 1;
-      })
+      this.purchaseData.title = null;
+      this.purchaseData.amount = 1;
+      this.purchaseData.link = null;
+      this.purchaseData.purchasePlace = null;
+      this.sourceOfPurchaseSelected = [];
+      this.purchaseData.guaranteeInterval = null;
+      this.purchaseData.guaranteeDuration = null;
+      this.$refs.form.resetValidation();
+      this.dialog = false;
     },
     urlRegex() {
       const pattern = new RegExp(
@@ -427,13 +474,26 @@ export default {
       );
       return pattern;
     },
+    getGuaranteeExpireDate(interval, duration) {
+      const date = new Date(this.purchaseData.purchaseDate);
+
+      if (interval === "День") {
+        date.setDate(date.getDate() + parseInt(duration));
+      } else if (interval === "Месяц") {
+        date.setMonth(date.getMonth() + parseInt(duration));
+      } else if (interval === "Год") {
+        date.setFullYear(date.getFullYear() + parseInt(duration));
+      }
+
+      return date;
+    }
   },
   created() {
     this.loadRecords();
   },
   computed: {
     computedDateFormatted() {
-      return this.formatDate(this.purchaseDate)
+      return this.formatDate(this.purchaseData.purchaseDate)
     },
   },
 }
