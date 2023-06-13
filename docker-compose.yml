@@ -29,21 +29,10 @@ services:
     build: ./weight
     restart: always
     depends_on:
-      - weight_mariadb
-  purchases:
-    build: ./purchases
-    restart: always
-    depends_on:
       - mariadb
-  weight_mariadb:
+  mariadb:
     image: mariadb
     restart: always
     environment:
       MYSQL_DATABASE: ms_ht_weight
-      MARIADB_ROOT_PASSWORD: root
-  purchases_mariadb:
-    image: mariadb
-    restart: always
-    environment:
-      MYSQL_DATABASE: ms_ht_purchases
       MARIADB_ROOT_PASSWORD: root

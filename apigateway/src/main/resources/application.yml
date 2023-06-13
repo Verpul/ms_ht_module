@@ -7,19 +7,19 @@ spring:
       globalcors:
         corsconfigurations:
           '[/**]':
-            allowedOrigins: "http://localhost:8080"
+            allowedOrigins: "http://localhost:8081"
             allowedHeaders: "Authorization, Content-Type"
             allowedMethods: "GET, POST, PUT, DELETE, OPTIONS"
       routes:
         - id: weight
           uri: http://weight:8100
-          #Without Docker
-          #uri: http://localhost:8100
+         # Without Docker
+         # uri: http://localhost:8100
           predicates:
             - Path=/weight/**
         - id: purchases
-          # uri: http://purcahses:8101
+          uri: http://purcahses:8101
           # Without Docker
-          uri: http://localhost:8101
+          # uri: http://localhost:8100
           predicates:
             - Path=/purchases/**
