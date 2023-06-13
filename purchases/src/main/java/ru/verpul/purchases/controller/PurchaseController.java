@@ -50,6 +50,7 @@ public class PurchaseController {
         purchase.setPurchasePlace(purchaseData.getPurchasePlace());
         purchase.setGuaranteeInterval(purchaseData.getGuaranteeInterval());
         purchase.setGuaranteeDuration(purchaseData.getGuaranteeDuration());
+        purchase.setActive(purchaseData.getActive());
         purchase.setId(purchaseData.getId());
         final Purchase updateWeight = purchaseRepository.save(purchase);
         return ResponseEntity.ok(updateWeight);

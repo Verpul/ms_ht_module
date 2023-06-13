@@ -45,10 +45,16 @@
                 <td>{{ record.purchasePlace }}</td>
                 <td class="text-right">
                   <div class="d-inline-block" style="white-space: nowrap">
+                    <v-btn density="compact" @click="finishPurchase(record)" icon>
+                      <v-icon color="success">mdi mdi-check</v-icon>
+                    </v-btn>
+                    <v-btn density="compact" @click="finishPurchaseAndCreateGuarantee(record)" icon>
+                      <v-icon color="primary">mdi mdi-clipboard-text-clock-outline</v-icon>
+                    </v-btn>
                     <v-btn density="compact" @click="editRecord(record)" icon>
                       <v-icon color="warning">mdi-square-edit-outline</v-icon>
                     </v-btn>
-                    <v-btn density="compact" @click="deleteRecord(record.id)" class="ms-3"
+                    <v-btn density="compact" @click="deleteRecord(record.id)"
                            icon>
                       <v-icon color="error">mdi-delete-outline</v-icon>
                     </v-btn>
@@ -323,7 +329,7 @@ export default {
         linkRules: [],
         purchaseDateRules: [],
         guaranteeTimeIntervalRules: [],
-        guaranteeDurationRules: []
+        guaranteeDurationRules: [],
       }
     }
   },
@@ -486,6 +492,23 @@ export default {
       }
 
       return date;
+    },
+    finishPurchase(record) {
+      if ((record.link === "" || record.link === null)
+          && (record.purchasePlace === "" || record.purchasePlace === null)) {
+        this.deleteRecord(record.id);
+      } else {
+        record.active = false;
+        PurchasesService.updateRecord(record.id, record).then(() => {
+          this.clearFields();
+          this.loadRecords();
+        });
+      }
+    },
+    finishPurchaseAndCreateGuarantee(record) {
+      this.tab = 1;
+      this.editRecord(record);
+      this.dialog = true;
     }
   },
   created() {
