@@ -2,6 +2,7 @@ package ru.verpul.purchases.controller;
 
 import org.springframework.web.bind.annotation.*;
 import ru.verpul.purchases.exception.RecordNotFoundException;
+import ru.verpul.purchases.helpers.PurchaseExpireDateHelper;
 import ru.verpul.purchases.model.Purchase;
 import ru.verpul.purchases.repository.PurchaseRepository;
 
@@ -28,6 +29,7 @@ public class PurchaseController {
 
     @PostMapping
     public Purchase create(@RequestBody Purchase purchase) {
+        PurchaseExpireDateHelper.setExpireDate(purchase);
         return purchaseRepository.save(purchase);
     }
 
@@ -40,12 +42,12 @@ public class PurchaseController {
                     purchase.setLink(purchaseData.getLink());
                     purchase.setAmount(purchaseData.getAmount());
                     purchase.setPurchaseDate(purchaseData.getPurchaseDate());
-                    purchase.setGuaranteeExpireDate(purchaseData.getGuaranteeExpireDate());
                     purchase.setPurchasePlace(purchaseData.getPurchasePlace());
                     purchase.setGuaranteeInterval(purchaseData.getGuaranteeInterval());
                     purchase.setGuaranteeDuration(purchaseData.getGuaranteeDuration());
                     purchase.setActive(purchaseData.getActive());
                     purchase.setId(purchaseData.getId());
+                    PurchaseExpireDateHelper.setExpireDate(purchase);
                     return purchaseRepository.save(purchase);
                 })
                 .orElseThrow(() -> new RecordNotFoundException(id));

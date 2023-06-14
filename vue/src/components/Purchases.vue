@@ -45,11 +45,8 @@
                 <td>{{ record.purchasePlace }}</td>
                 <td class="text-right">
                   <div class="d-inline-block" style="white-space: nowrap">
-                    <v-btn density="compact" @click="finishPurchase(record)" icon>
-                      <v-icon color="success">mdi mdi-check</v-icon>
-                    </v-btn>
-                    <v-btn density="compact" @click="finishPurchaseAndCreateGuarantee(record)" icon>
-                      <v-icon color="primary">mdi mdi-clipboard-text-clock-outline</v-icon>
+                    <v-btn density="compact" @click="chooseNextStepCompletePurchase(record)" icon>
+                      <v-icon color="primary">mdi mdi-content-save-check-outline</v-icon>
                     </v-btn>
                     <v-btn density="compact" @click="editRecord(record)" icon>
                       <v-icon color="warning">mdi-square-edit-outline</v-icon>
@@ -97,7 +94,7 @@
                     <v-btn density="compact" @click="editRecord(record)" icon>
                       <v-icon color="warning">mdi-square-edit-outline</v-icon>
                     </v-btn>
-                    <v-btn density="compact" @click="deleteRecord(record.id)" class="ms-3"
+                    <v-btn density="compact" @click="deleteRecord(record.id)"
                            icon>
                       <v-icon color="error">mdi-delete-outline</v-icon>
                     </v-btn>
@@ -118,7 +115,11 @@
                 <th>Наименование</th>
                 <th>Место покупки</th>
                 <th>Дата покупки</th>
-                <th></th>
+                <th class="text-right">
+                  <v-btn density="compact" icon @click="dialog = true">
+                    <v-icon color="success">mdi-plus-box-outline</v-icon>
+                  </v-btn>
+                </th>
               </tr>
               </thead>
               <tbody>
@@ -136,7 +137,7 @@
                     <v-btn density="compact" @click="editRecord(record)" icon>
                       <v-icon color="warning">mdi-square-edit-outline</v-icon>
                     </v-btn>
-                    <v-btn density="compact" @click="deleteRecord(record.id)" class="ms-3"
+                    <v-btn density="compact" @click="deleteRecord(record.id)"
                            icon>
                       <v-icon color="error">mdi-delete-outline</v-icon>
                     </v-btn>
@@ -151,7 +152,7 @@
       </v-tabs-items>
     </v-card>
 
-    <!--  Modal start  -->
+    <!--  Modal for add and edit start  -->
     <v-row justify="center">
       <v-dialog
           v-model="dialog"
@@ -257,7 +258,7 @@
                         v-model="purchaseData.guaranteeDuration"
                         :rules="purchaseDataRules.guaranteeDurationRules"
                         type="number"
-                                  label="Гарантия (длительность)*"
+                        label="Гарантия (длительность)*"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -285,7 +286,32 @@
         </v-form>
       </v-dialog>
     </v-row>
-    <!--  Modal end  -->
+    <!--  Modal for add and edit end  -->
+    <!--  Modal for completing purchase start  -->
+    <v-row justify="center">
+      <v-dialog
+          v-model="purchaseCompleteModal"
+          max-width="500px"
+      >
+        <v-card>
+          <v-card-title v-text="'Выберите дальнейшее действие'" class="mb-2">
+          </v-card-title>
+          <v-card-text class="text-center">
+            <div>
+              <span>Если вы не хотите сохранять покупку, то удалите ее</span>
+            </div>
+            <v-btn class="mt-3" outlined color="indigo"
+                   @click="completePurchase(1)">Добавить гарантию покупки
+            </v-btn>
+            <v-btn class="mt-3" outlined color="teal"
+                   @click="completePurchase(2)"
+            >Добавить запись в историю покупок
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+    </v-row>
+    <!--  Modal for completing purchase end   -->
   </div>
 </template>
 
@@ -298,18 +324,20 @@ export default {
     return {
       tab: null,
       tabs: [
-        'Покупки', 'Гарантии', 'Ссылки и места купленных вещей'
+        'Покупки', 'Гарантии', 'История покупок'
       ],
       recordsActive: [],
       recordsGuarantee: [],
       recordsLinksPlaces: [],
       dialog: false,
+      purchaseCompleteModal: false,
       sourceOfPurchase: [
         'Ссылка', 'Место покупки'
       ],
       guaranteeTimeInterval: [
         'День', 'Месяц', 'Год'
       ],
+      currentRecord: null,
       sourceOfPurchaseSelected: [],
       calendarMenu: false,
       purchaseData: {
@@ -367,7 +395,7 @@ export default {
       ]
 
       this.purchaseDataRules.purchasePlaceRules = [
-        v => (v === null || v === "" || (v && v.length <= 100 )) || "Место покупки не может превышать 100 символов"
+        v => (v === null || v === "" || (v && v.length <= 100)) || "Место покупки не может превышать 100 символов"
       ]
 
       //Guarantees and places
@@ -403,14 +431,14 @@ export default {
           //Guarantee & place
           if (this.tab === 1 || this.tab === 2) {
             record.purchaseDate = this.purchaseData.purchaseDate;
+            record.active = false;
           }
 
           //Guarantee tab
           if (this.tab === 1) {
-            record.active = false;
             record.guaranteeInterval = this.purchaseData.guaranteeInterval;
             record.guaranteeDuration = this.purchaseData.guaranteeDuration;
-            record.guaranteeExpireDate = this.getGuaranteeExpireDate(this.purchaseData.guaranteeInterval, this.purchaseData.guaranteeDuration);
+            // record.guaranteeExpireDate = this.getGuaranteeExpireDate(this.purchaseData.guaranteeInterval, this.purchaseData.guaranteeDuration);
           }
 
           if (this.purchaseData.id == null) {
@@ -440,7 +468,9 @@ export default {
 
       //Guarantee & places
       if (this.tab === 1 || this.tab === 2) {
-        this.purchaseData.purchaseDate = record.purchaseDate;
+        if (record.purchaseDate !== null) {
+          this.purchaseData.purchaseDate = record.purchaseDate;
+        }
       }
 
       //Guarantee tab
@@ -457,7 +487,7 @@ export default {
       })
     },
     clearFields() {
-      this.id = null;
+      this.purchaseData.id = null;
       this.purchaseData.title = null;
       this.purchaseData.amount = 1;
       this.purchaseData.link = null;
@@ -465,6 +495,8 @@ export default {
       this.sourceOfPurchaseSelected = [];
       this.purchaseData.guaranteeInterval = null;
       this.purchaseData.guaranteeDuration = null;
+      this.currentRecord = null;
+      this.purchaseData.purchaseDate = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10);
       this.$refs.form.resetValidation();
       this.dialog = false;
     },
@@ -480,36 +512,30 @@ export default {
       );
       return pattern;
     },
-    getGuaranteeExpireDate(interval, duration) {
-      const date = new Date(this.purchaseData.purchaseDate);
-
-      if (interval === "День") {
-        date.setDate(date.getDate() + parseInt(duration));
-      } else if (interval === "Месяц") {
-        date.setMonth(date.getMonth() + parseInt(duration));
-      } else if (interval === "Год") {
-        date.setFullYear(date.getFullYear() + parseInt(duration));
-      }
-
-      return date;
+    // getGuaranteeExpireDate(interval, duration) {
+    //   const date = new Date(this.purchaseData.purchaseDate);
+    //
+    //   if (interval === "День") {
+    //     date.setDate(date.getDate() + parseInt(duration));
+    //   } else if (interval === "Месяц") {
+    //     date.setMonth(date.getMonth() + parseInt(duration));
+    //   } else if (interval === "Год") {
+    //     date.setFullYear(date.getFullYear() + parseInt(duration));
+    //   }
+    //
+    //   return date;
+    // },
+    chooseNextStepCompletePurchase(record) {
+      this.currentRecord = record;
+      this.purchaseCompleteModal = true;
     },
-    finishPurchase(record) {
-      if ((record.link === "" || record.link === null)
-          && (record.purchasePlace === "" || record.purchasePlace === null)) {
-        this.deleteRecord(record.id);
-      } else {
-        record.active = false;
-        PurchasesService.updateRecord(record.id, record).then(() => {
-          this.clearFields();
-          this.loadRecords();
-        });
-      }
-    },
-    finishPurchaseAndCreateGuarantee(record) {
-      this.tab = 1;
-      this.editRecord(record);
+    completePurchase(tabNumber) {
+      this.tab = tabNumber;
+      this.purchaseCompleteModal = false;
+      this.editRecord(this.currentRecord);
+      this.currentRecord = null;
       this.dialog = true;
-    }
+    },
   },
   created() {
     this.loadRecords();
