@@ -6,6 +6,9 @@ import ru.verpul.purchases.helpers.PurchaseExpireDateHelper;
 import ru.verpul.purchases.model.Purchase;
 import ru.verpul.purchases.repository.PurchaseRepository;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @RestController
 @RequestMapping("/purchases")
 public class PurchaseController {
@@ -19,6 +22,11 @@ public class PurchaseController {
     @GetMapping
     public Iterable<Purchase> getAll() {
         return purchaseRepository.findAll();
+    }
+
+    @GetMapping("/guarantee")
+    public List<Purchase> getExpiredGuarantees() {
+        return purchaseRepository.findByActiveIsFalseAndGuaranteeExpireDateLessThanEqual(LocalDate.now());
     }
 
     @GetMapping("/{id}")
