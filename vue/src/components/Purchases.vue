@@ -84,13 +84,20 @@
                   v-for="(record) in recordsGuarantee"
                   :key="record.id"
               >
-                <td v-if="record.link == null">{{ record.title }}</td>
+                <td v-if="record.link == null || record.link === ''">{{ record.title }}</td>
                 <td v-else><a
                     :href="record.link">{{ record.title }}</a></td>
                 <td>{{ formatDate(record.guaranteeExpireDate) }}</td>
                 <td>{{ record.purchasePlace }}</td>
                 <td class="text-right">
                   <div class="d-inline-block" style="white-space: nowrap">
+                    <v-btn v-if="guaranteeNotOver(record)" density="compact"
+                           @click="repeatOrCompletePurchase(record, 0)" icon>
+                      <v-icon color="purple">mdi mdi-cached</v-icon>
+                    </v-btn>
+                    <v-btn v-else density="compact" @click="repeatOrCompletePurchase(record, 2)" icon>
+                      <v-icon color="primary">mdi mdi-check</v-icon>
+                    </v-btn>
                     <v-btn density="compact" @click="editRecord(record)" icon>
                       <v-icon color="warning">mdi-square-edit-outline</v-icon>
                     </v-btn>
@@ -127,13 +134,16 @@
                   v-for="(record) in recordsLinksPlaces"
                   :key="record.id"
               >
-                <td v-if="record.link == null">{{ record.title }}</td>
+                <td v-if="record.link == null || record.link === ''">{{ record.title }}</td>
                 <td v-else><a
                     :href="record.link">{{ record.title }}</a></td>
                 <td>{{ record.purchasePlace }}</td>
                 <td>{{ formatDate(record.purchaseDate) }}</td>
                 <td class="text-right">
                   <div class="d-inline-block" style="white-space: nowrap">
+                    <v-btn density="compact" @click="repeatOrCompletePurchase(record, 0)" icon>
+                      <v-icon color="purple">mdi mdi-cached</v-icon>
+                    </v-btn>
                     <v-btn density="compact" @click="editRecord(record)" icon>
                       <v-icon color="warning">mdi-square-edit-outline</v-icon>
                     </v-btn>
@@ -534,8 +544,21 @@ export default {
       this.purchaseCompleteModal = false;
       this.editRecord(this.currentRecord);
       this.currentRecord = null;
-      this.dialog = true;
     },
+    repeatOrCompletePurchase(record, tabNumber) {
+      this.tab = tabNumber;
+
+      if (tabNumber === 0) {
+        record.id = null;
+      }
+
+      this.editRecord(record);
+    },
+    guaranteeNotOver(record) {
+      const guaranteeExpireDate = new Date(record.guaranteeExpireDate);
+      const dateNow = new Date();
+      return guaranteeExpireDate > dateNow;
+    }
   },
   created() {
     this.loadRecords();

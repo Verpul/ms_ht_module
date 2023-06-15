@@ -15,7 +15,10 @@ public class PurchaseExpireDateHelper {
                     purchase.getGuaranteeInterval(),
                     purchase.getGuaranteeDuration()
             ));
+        } else {
+            purchase.setGuaranteeExpireDate(null);
         }
+
         return purchase;
     }
 
