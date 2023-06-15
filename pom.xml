@@ -13,6 +13,7 @@
         <module>weight</module>
         <module>apigateway</module>
         <module>purchases</module>
+        <module>mailsender</module>
     </modules>
 
 </project>
