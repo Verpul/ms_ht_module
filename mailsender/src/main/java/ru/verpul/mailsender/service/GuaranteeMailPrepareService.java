@@ -2,17 +2,15 @@ package ru.verpul.mailsender.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import ru.verpul.mailsender.model.Guarantee;
 
 import java.time.format.DateTimeFormatter;
 
 
-@RestController
-@RequestMapping("/mail")
+@Service
 public class GuaranteeMailPrepareService {
 
     @Autowired
@@ -23,8 +21,9 @@ public class GuaranteeMailPrepareService {
         this.mailSendService = mailSendService;
     }
 
-    @PostMapping
-    public void receiveGuaranteeDataAndSendMail() {
+    @Scheduled(cron = "0 0 * * * ?")
+    private void receiveGuaranteeDataAndSendMail() {
+        System.out.println("Do you even trying");
         ResponseEntity<Guarantee[]> response = restTemplate.getForEntity("http://localhost:9000/purchases/guarantee", Guarantee[].class);
         Guarantee[] guarantees = response.getBody();
         if (guarantees != null && guarantees.length != 0) {
@@ -35,7 +34,7 @@ public class GuaranteeMailPrepareService {
     }
 
     private String makeMessage(Guarantee[] guarantees) {
-        StringBuilder message = new StringBuilder("Истек срок гарантии: \n");
+        StringBuilder message = new StringBuilder("Истек срок гарантии: \n\n");
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
         for (Guarantee guarantee: guarantees) {
