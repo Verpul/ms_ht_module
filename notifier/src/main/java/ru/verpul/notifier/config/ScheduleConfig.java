@@ -1,4 +1,4 @@
-package ru.verpul.tgbot.config;
+package ru.verpul.notifier.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
