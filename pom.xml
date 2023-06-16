@@ -14,6 +14,7 @@
         <module>apigateway</module>
         <module>purchases</module>
         <module>mailsender</module>
+        <module>tgbot</module>
     </modules>
 
 </project>

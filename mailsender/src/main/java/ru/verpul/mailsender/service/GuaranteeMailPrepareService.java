@@ -23,7 +23,6 @@ public class GuaranteeMailPrepareService {
 
     @Scheduled(cron = "0 0 * * * ?")
     private void receiveGuaranteeDataAndSendMail() {
-        System.out.println("Do you even trying");
         ResponseEntity<Guarantee[]> response = restTemplate.getForEntity("http://localhost:9000/purchases/guarantee", Guarantee[].class);
         Guarantee[] guarantees = response.getBody();
         if (guarantees != null && guarantees.length != 0) {
