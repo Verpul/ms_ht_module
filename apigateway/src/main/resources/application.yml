@@ -23,3 +23,7 @@ spring:
           # uri: http://localhost:8100
           predicates:
             - Path=/purchases/**
+        - id: telegram
+          uri: http://localhost:8103
+          predicates:
+            - Path=/tg

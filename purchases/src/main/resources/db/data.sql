@@ -11,3 +11,5 @@ INSERT IGNORE INTO purchases VALUES
     (5, 'Покупка №5', 'https://www.buy.com', null, 1, '2023-02-02', '2023-07-02', false, 'Месяц', 6);
 INSERT IGNORE INTO purchases VALUES
     (6, 'Покупка №6', null, 'Mall', 1, '2023-02-02', null, false, null, null);
+INSERT IGNORE INTO purchases VALUES
+    (7, 'Покупка №4', null, null, 1, '2022-01-01', '2023-01-01', false, 'Год', 1);
