@@ -1,6 +1,8 @@
 package ru.verpul.purchases.controller;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
+import ru.verpul.purchases.DTO.PurchaseDTO;
 import ru.verpul.purchases.exception.RecordNotFoundException;
 import ru.verpul.purchases.helpers.PurchaseExpireDateHelper;
 import ru.verpul.purchases.model.Purchase;
@@ -8,15 +10,18 @@ import ru.verpul.purchases.repository.PurchaseRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/purchases")
 public class PurchaseController {
 
     private final PurchaseRepository purchaseRepository;
+    private final ModelMapper modelMapper;
 
-    public PurchaseController(PurchaseRepository purchaseRepository) {
+    public PurchaseController(PurchaseRepository purchaseRepository, ModelMapper modelMapper) {
         this.purchaseRepository = purchaseRepository;
+        this.modelMapper = modelMapper;
     }
 
     @GetMapping
@@ -25,8 +30,11 @@ public class PurchaseController {
     }
 
     @GetMapping("/guarantee")
-    public List<Purchase> getExpiredGuarantees() {
-        return purchaseRepository.findByActiveIsFalseAndGuaranteeExpireDateLessThanEqual(LocalDate.now());
+    public List<PurchaseDTO> getExpiredGuarantees() {
+        List<Purchase> guarantees = purchaseRepository.findByActiveIsFalseAndGuaranteeExpireDateLessThanEqual(LocalDate.now());
+        return guarantees.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
@@ -64,5 +72,9 @@ public class PurchaseController {
     @DeleteMapping({"/{id}"})
     public void delete(@PathVariable("id") Integer id) {
         purchaseRepository.deleteById(id);
+    }
+
+    private PurchaseDTO convertToDto(Purchase purchase) {
+        return modelMapper.map(purchase, PurchaseDTO.class);
     }
 }
