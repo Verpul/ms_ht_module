@@ -17,7 +17,6 @@ public class TGBotController {
 
     @PostMapping
     public void receiveMessage(@RequestBody String message) {
-        System.out.println(message);
         tgBotService.sendMessage(message);
     }
 }
