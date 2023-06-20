@@ -17,8 +17,8 @@ public class NotifierComponent {
     @Autowired
     private RestTemplate restTemplate;
 
-//    @Scheduled(cron = "0 0 * * * ?")
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0 * * * ?")
+//    @Scheduled(cron = "0 * * * * ?")
     private void GuaranteesNotifications() {
         ResponseEntity<Guarantee[]> response = restTemplate.getForEntity("http://localhost:9000/purchases/guarantee", Guarantee[].class);
         Guarantee[] guarantees = response.getBody();
