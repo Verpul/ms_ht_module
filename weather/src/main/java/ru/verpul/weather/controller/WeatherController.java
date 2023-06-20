@@ -1,23 +1,30 @@
 package ru.verpul.weather.controller;
 
 import org.springframework.web.bind.annotation.*;
+import ru.verpul.weather.component.WeatherComponent;
 
 @RestController
 @RequestMapping("/weather")
 public class WeatherController {
 
-    @GetMapping
-    public void getMurmanskWeatherForNow() {
+    private final WeatherComponent weatherComponent;
 
+    public WeatherController(WeatherComponent weatherComponent) {
+        this.weatherComponent = weatherComponent;
+    }
+
+    @GetMapping
+    public String getMyCityWeatherForNow() {
+        return weatherComponent.makeMyCityWeatherMessageForNow();
     }
 
     @GetMapping("/today")
-    public void getMurmanskWeatherForToday() {
+    public void getMyCityWeatherForToday() {
 
     }
 
     @GetMapping("/week")
-    public void getMurmanskWeatherForWeek() {
+    public void getMyCityWeatherForWeek() {
 
     }
 

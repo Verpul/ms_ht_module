@@ -33,7 +33,7 @@ public class WeatherDTO {
     }
 
     @Getter
-    private static class WeatherShortIntervals extends WeatherData{
+    public static class WeatherShortIntervals extends WeatherData{
         private Map<String, String> symbolCode;
         private Map<String, String> feelsLike;
     }

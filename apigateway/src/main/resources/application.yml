@@ -31,3 +31,7 @@ spring:
           uri: http://localhost:8103
           predicates:
             - Path=/tg
+        - id: weather
+          uri: http://localhost:8104
+          predicates:
+            - Path=/weather/**
