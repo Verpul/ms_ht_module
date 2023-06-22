@@ -14,22 +14,17 @@ public class WeatherController {
     }
 
     @GetMapping
-    public String getMyCityWeatherForNow() {
+    public String getWeatherForToday() {
         return weatherComponent.makeMyCityWeatherMessageForNow();
     }
 
-    @GetMapping("/today")
-    public void getMyCityWeatherForToday() {
+    @GetMapping("/tomorrow")
+    public void getMyCityWeatherForTomorrow() {
 
     }
 
     @GetMapping("/week")
-    public void getMyCityWeatherForWeek() {
-
-    }
-
-    @PostMapping("/{location}")
-    public void getLocationWeatherForNow(@RequestBody String location) {
+    public void getWeatherForWeek() {
 
     }
 }

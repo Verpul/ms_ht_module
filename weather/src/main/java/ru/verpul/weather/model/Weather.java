@@ -1,4 +1,4 @@
-package ru.verpul.weather.DTO;
+package ru.verpul.weather.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
-public class WeatherDTO {
+public class Weather {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     private LocalDateTime created;
 
@@ -35,6 +35,6 @@ public class WeatherDTO {
     @Getter
     public static class WeatherShortIntervals extends WeatherData{
         private Map<String, String> symbolCode;
-        private Map<String, String> feelsLike;
+        private Map<String, Object> feelsLike;
     }
 }
