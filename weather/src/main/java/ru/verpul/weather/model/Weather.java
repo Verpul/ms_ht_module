@@ -16,6 +16,7 @@ public class Weather {
 
     private List<WeatherDayInterval> dayIntervals;
     private List<WeatherShortIntervals> shortIntervals;
+    private List<WeatherLongIntervals> longIntervals;
 
     @Getter
     private static class WeatherData {
@@ -28,13 +29,18 @@ public class Weather {
     }
 
     @Getter
-    private static class WeatherDayInterval extends WeatherData{
+    public static class WeatherDayInterval extends WeatherData {
         private List<String> sixHourSymbols;
     }
 
     @Getter
-    public static class WeatherShortIntervals extends WeatherData{
+    public static class WeatherShortIntervals extends WeatherData {
         private Map<String, String> symbolCode;
         private Map<String, Object> feelsLike;
+    }
+
+    @Getter
+    public static class WeatherLongIntervals extends WeatherData {
+        private Map<String, String> symbolCode;
     }
 }
