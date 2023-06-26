@@ -39,18 +39,18 @@ public class WeatherMessageToTelegramComponent {
         StringBuilder message = new StringBuilder();
 
         for (Weather.WeatherDayInterval interval : dayIntervalsForTheWeek) {
-            message.append(interval.getStart().format(dateTimeFormatter)).append(": ");
-            message.append("Ночь - ").append(getWeatherEmoji(interval.getSixHourSymbols().get(0))).append(" | ");
-            message.append("Утро - ").append(getWeatherEmoji(interval.getSixHourSymbols().get(1))).append(" | ");
-            message.append("День - ").append(getWeatherEmoji(interval.getSixHourSymbols().get(2))).append(" | ");
-            message.append("Вечер - ").append(getWeatherEmoji(interval.getSixHourSymbols().get(3))).append(", ");
-            message.append("t°(max, min) ").append(objectToIntWithRound(interval.getTemperature().get("max"))).append("°/");
-            message.append(objectToIntWithRound(interval.getTemperature().get("min"))).append("°, ");
+            message.append(interval.getStart().format(dateTimeFormatter)).append(": ").append("\n");
+            message.append("Ночь - ").append(getWeatherEmoji(interval.getSixHourSymbols().get(0))).append("\n");
+            message.append("Утро - ").append(getWeatherEmoji(interval.getSixHourSymbols().get(1))).append("\n");
+            message.append("День - ").append(getWeatherEmoji(interval.getSixHourSymbols().get(2))).append("\n");
+            message.append("Вечер - ").append(getWeatherEmoji(interval.getSixHourSymbols().get(3))).append("\n");
+            message.append("Температура (max, min) ").append(objectToIntWithRound(interval.getTemperature().get("max"))).append("°|");
+            message.append(objectToIntWithRound(interval.getTemperature().get("min"))).append("°").append("\n");
             if (interval.getPrecipitation().get("value") != 0.0) {
-                message.append("Осадки ").append(interval.getPrecipitation().get("value")).append(" мм, ");
+                message.append("Осадки ").append(interval.getPrecipitation().get("value")).append(" мм").append("\n");
             }
-            message.append(objectToIntWithRound(interval.getWind().get("max"))).append("м/с");
-            message.append("\n");
+            message.append("Ветер - ").append(objectToIntWithRound(interval.getWind().get("max"))).append("м/с");
+            message.append("\n\n");
         }
 
         return message.toString();

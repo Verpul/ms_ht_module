@@ -20,7 +20,7 @@ public class WeatherController {
     }
 
     @GetMapping("/days")
-    public String getMyCityWeatherForTomorrow() {
+    public String getMyCityWeatherForFewDays() {
         return weatherMessageToTelegramComponent.makeMyCityWeatherMessage(WeatherPeriod.THREE_DAYS);
     }
 
